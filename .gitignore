@@ -1,0 +1,7 @@
+node_modules/
+
+.project
+.settings
+.jshintrc
+.sublime-project
+.tern-project
