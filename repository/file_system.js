@@ -22,10 +22,48 @@ default:
 	console.log('Usage: ' + progress.argv[0] + ' list|add [taskDescription]');
 }
 
+function loadOrInitializeTaskArray(file, cb){
+	//tasks file이 있는지 검사
+	fs.exists(file, function(exists) {
+		var tasks = [];
+		if(exists){
+			//tasks 파일에서 할 일 데이터 읽기
+			fs.readFile(file, 'utf8', function(err, data) {
+				if(err){
+					throw err;
+				}
+				var data = data.toString();
+				//JSON으로 인코딩된 할 일 데이터를 작업의 배열로 파싱
+				var tasks = JSON.parse(data || '[]');
+				cb(tasks);
+			});
+		}else{
+			//작업 파일이 존재하지 않으면 빈 작업 배열 생성
+			cb([]);
+		}
+	});
+}
+
 function listTasks(file){
-	
+	loadOrInitializeTaskArray(file, function(tasks) {
+		for(var i in tasks){
+			console.log(tasks[i]);
+		}
+	});
+}
+
+function storeTasks(file, tasks){
+	fs.writeFile(file, JSON.stringify(tasks), 'utf8', function(err) {
+		if(err){
+			throw err;
+		}
+		console.log('saved.');
+	});
 }
 
 function addTask(file, taskDescription){
-	
+	loadOrInitializeTaskArray(file, function(tasks) {
+		tasks.push(taskDescription);
+		storeTasks(file, tasks);
+	});
 }
